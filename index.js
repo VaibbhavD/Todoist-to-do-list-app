@@ -1,7 +1,7 @@
-const reman="aa6f99e331dd4c2d87de168bb7278f80";
-const don="4cd78f95e55f4c48a41b4cb54299ba19";
+// -------------------------------------- APIs ID
+const remaning="5d4e688f9a5342ceaa26cfcacdf457d1";
 
-
+// -----------------------------------------------function savedetails
 function savedetails(event){
    event.preventDefault();
    const name=event.target.name.value;
@@ -10,41 +10,48 @@ function savedetails(event){
    const todoobj={
        name,
        description,
+       done:false,
    }
-   axios.post("https://crudcrud.com/api/"+reman+"/reaminingtodo",todoobj)
-   .then(res=>console.log(res))
-   .catch(err=>console.log(err))
+   async function storedata(todoobj){
+   const resonse=await axios.post("https://crudcrud.com/api/"+remaning+"/reaminingtodo",todoobj)
+   showitemdetails(resonse.data);
+   }
 
-   showitemdetails(todoobj);
-
+   storedata(todoobj);
+   
    document.getElementById("name").value="";
    document.getElementById("description").value="";
 }
 
-// ---------------------------------------------------
+// ---------------------------------------------------window listner display data 
 
     window.addEventListener("DOMContentLoaded",()=>{
-        axios.get("https://crudcrud.com/api/"+reman+"/reaminingtodo")
-        .then(response => {
-            for(var i=0;i<response.data.length;i++)
+       async function displaydata(){
+        const res= await axios.get("https://crudcrud.com/api/"+remaning+"/reaminingtodo")
+        
+            for(var i=0;i<res.data.length;i++)
             {
-                if(response.data.status==404)
+                if(res.data[i].done==false)
                 {
-                    continue;
+                   showitemdetails(res.data[i]);
                 }
-                showitemdetails(response.data[i]);
+                else{
+                    showsavedtodo(res.data[i]);
+                }
             }
-        })
-        .catch(err=>console.log(err))
-        })
 
-// =---------------------------------------------
+        }
+        displaydata();
+    })
+        
+
+// =---------------------------------------------add data and display on remaning section
 
 function showitemdetails (todoobj){
     itemobj={
-        _id:todoobj._id,
         name:todoobj.name,
         description:todoobj.description,
+        done:todoobj.done,
     }
    const parent=document.getElementById("remaing");
    const child=document.createElement("li");
@@ -60,58 +67,47 @@ function showitemdetails (todoobj){
    child.appendChild(pdes);
    parent.appendChild(child);
    
-   
+//    --------------------------------------------------------- done button 
 
    const donee=document.createElement('input')
    donee.type="button";
    donee.className="donee";
    donee.value="DONE";
    donee.onclick=()=>{
-    var id=todoobj._id;
-       savedtodo(todoobj); 
-       del(id);
-       parent.removeChild(child);
+    donnnclick();
    }
    child.appendChild(donee);
 
-    //    ------------------------------------------------------   
+    //    ------------------------------------------------------remove function
+
    const remov=document.createElement('input')
    remov.type="button";
    remov.className="remov";
    remov.value="REMOVE";
-   remov.onclick=()=>{
+   remov.onclick=async()=>{
+    const res=await axios.delete("https://crudcrud.com/api/"+remaning+"/reaminingtodo/"+todoobj._id);
+    alert('Remove Succesfull !');
     parent.removeChild(child);
-    axios.delete("https://crudcrud.com/api/"+reman+"/reaminingtodo/"+itemobj._id)
-    .then(res=>console.log(res))
-    .catch(err=>console.log(err));
    }
-   child.appendChild(remov);
-}
+    child.appendChild(remov);
 
-// --------------------------------------------
-
-function savedtodo (todoobj){
-    itemobj={
+    // ------------------------------------------------async done function 
+async function donnnclick(){
+    const obj={
         name:todoobj.name,
         description:todoobj.description,
+        done:true,
     }
-    var id=todoobj._id;
-    axios.post("https://crudcrud.com/api/"+don+"/done",itemobj)
-    .then(res=>console.log(res))
-    .catch(err=>console.log(err))
-    showsavedtodo(todoobj);
+   const res=await axios.put("https://crudcrud.com/api/"+remaning+"/reaminingtodo/"+todoobj._id,obj)
+   console.log(res)
+   showsavedtodo(obj);
+   parent.removeChild(child);
+   alert("Done Succesfull!");  
 }
-
-function del(id){
-    axios.delete("https://crudcrud.com/api/"+reman+"/reaminingtodo/"+id)
-    .then(res=>console.log(res))
-    .catch(err=>console.log(err));
-    console.log(itemobj._id);
 }
-
+// ----------------------------------------------------savedone data display on done section
 function showsavedtodo (todoobj){
     itemobj={
-        _id:todoobj._id,
         name:todoobj.name,
         description:todoobj.description,
     }
@@ -131,16 +127,38 @@ function showsavedtodo (todoobj){
    parent2.appendChild(child);
 }
 
+
+
+// async function savedtodo (todoobj){
+//     itemobj={
+//         name:todoobj.name,
+//         description:todoobj.description,
+//     }
+//     const url= "https://crudcrud.com/api/"+don+"/done";
+//     const res=await axios.post(url,itemobj)
+//     console.log(res);
+//     showsavedtodo(todoobj);
+// }
+
+// ----------------------------------------------------------
+
+// async function del(id){
+//     const res=await axios.delete("https://crudcrud.com/api/"+reman+"/reaminingtodo/"+id)
+// }
+// -------------------------------------------------------
+
+
+
 // ------------------------------------------------------------------
 
-window.addEventListener("DOMContentLoaded",()=>{
-    axios.get("https://crudcrud.com/api/"+don+"/done")
-    .then(response => {
-        for(var i=0;i<response.data.length;i++)
-        {
-
-            showsavedtodo(response.data[i]);
-        }
-    })
-    .catch(err=>console.log(err))
-    })
+// window.addEventListener("DOMContentLoaded",()=>{
+//     async function getdata(){
+//         const reaponse= await axios.get("https://crudcrud.com/api/"+don+"/done")
+        
+//             for(var i=0;i<reaponse.data.length;i++)
+//             {
+//                 showsavedtodo(reaponse.data[i]);
+//             }
+//         }
+//         getdata();
+//     })
